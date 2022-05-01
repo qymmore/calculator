@@ -7,18 +7,26 @@ const decimalButton = document.querySelector('#decimal-button');
 
 const displayContainer = document.querySelector('#display-container');
 const currentOperand = document.querySelector('.current-operand');
+const previousOperand = document.querySelector('.previous-operand');
 
-let storedNumber = '';
+let screenNumber = '';
+let firstNumber = '';
+let operatorChosen = '';
+let result = '';
+
 currentOperand.textContent = 0;
 
 
 //display clicked numbers on screen
-numberButtons.forEach((number) => {
-    number.addEventListener('click', function() {
-        storedNumber += number.value;
-        currentOperand.textContent = storedNumber;
-    })
-});
+function displayNumbers () {
+    numberButtons.forEach((number) => {
+        number.addEventListener('click', function() {
+            screenNumber += number.value;
+            currentOperand.textContent = screenNumber;
+        })
+    });
+}
+displayNumbers();
 
 
 function add(a, b) {
@@ -64,5 +72,5 @@ function operate(operator, a , b) {
         default:
             return null;
     }
-}
+};
 
