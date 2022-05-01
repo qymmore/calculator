@@ -1,0 +1,11 @@
+#buttons-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+#display-container {
+    background-color: antiquewhite;
+    padding: 20px 20px 20px 20px;
+    margin-bottom: 10px;
+    text-align: right;
+}
