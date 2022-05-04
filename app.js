@@ -5,29 +5,47 @@ const deleteButton = document.querySelector('#delete-button');
 const equalsButton = document.querySelector('#equals-button');
 const decimalButton = document.querySelector('#decimal-button');
 
-const displayContainer = document.querySelector('#display-container');
+const displayScreen = document.querySelector('.display-screen');
 const currentOperand = document.querySelector('.current-operand');
 const previousOperand = document.querySelector('.previous-operand');
 
-let screenNumber = '';
-let firstNumber = '';
-let operatorChosen = '';
-let result = '';
+const calculator = {
+    displayValue: '0',
+    firstOperand: null,
+    secondOperand: false,
+    chosenOperator: null,
+}
 
-currentOperand.textContent = 0;
+//default screen should always display 0
+function defaultDisplay() {
+    displayScreen.textContent = calculator.displayValue;
+}
+defaultDisplay();
 
-
-//display clicked numbers on screen
+//display clicked numbers and operators on screen
 function displayNumbers () {
     numberButtons.forEach((number) => {
         number.addEventListener('click', function() {
-            screenNumber += number.value;
-            currentOperand.textContent = screenNumber;
+            if(displayScreen.textContent === '0') {
+                displayScreen.textContent = number.value; //if display shows 0 change the display value to the number pressed
+            } else {
+                calculator.displayValue = number.value;
+                displayScreen.textContent += calculator.displayValue;
+            }
         })
     });
 }
 displayNumbers();
 
+function displayOperators () {
+    operatorButtons.forEach((operator) => {
+        operator.addEventListener('click', function() {
+            calculator.displayValue = operator.value;
+            displayScreen.textContent += calculator.displayValue;
+        })
+    });
+}
+displayOperators();
 
 function add(a, b) {
     return a + b;
