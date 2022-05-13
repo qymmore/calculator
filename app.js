@@ -4,6 +4,7 @@ const clearButton = document.querySelector('#clear-button');
 const deleteButton = document.querySelector('#delete-button');
 const equalsButton = document.querySelector('#equals-button');
 const decimalButton = document.querySelector('#decimal-button');
+const negativeButton = document.querySelector('#negative-button');
 
 const displayScreen = document.querySelector('.display-screen');
 const currentOperand = document.querySelector('.current-operand');
@@ -13,20 +14,17 @@ currentOperand.textContent = '';
 previousOperand.textContent = '';
 
 const calculator = {
-    displayValue: '0', //default display screen value should be this
+    displayValue: '0', 
     firstOperand: null,
     secondOperand: null,
     chosenOperator: null,
 }
 
-//default screen should always display 0
 function defaultDisplay() {
     displayScreen.textContent = calculator.displayValue;
 }
 defaultDisplay();
 
-
-//display clicked numbers and operators on screen and also save their values 
 function displayAll () {
     numberButtons.forEach((number) => {
         number.addEventListener('click', function() {
@@ -37,7 +35,12 @@ function displayAll () {
             } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
                 calculator.displayValue = number.value;
                 displayScreen.textContent += calculator.displayValue;
-                calculator.secondOperand = displayScreen.textContent; //store secondOperand if operator and first operand are not null
+                calculator.secondOperand = number.value; //store secondOperand if operator and first operand are not null
+                console.log(calculator.secondOperand);
+            } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) {
+                calculator.displayValue = number.value;
+                displayScreen.textContent += calculator.displayValue;
+                calculator.secondOperand += number.value ;
                 console.log(calculator.secondOperand);
             } else {
                 calculator.displayValue = number.value;
@@ -49,37 +52,50 @@ function displayAll () {
     });
     operatorButtons.forEach((operator) => {
         operator.addEventListener('click', function() {
-            if(calculator.firstOperand != null && calculator.chosenOperator === null) { //if calculator display is not zero and firstOperand is not null
-                calculator.displayValue = operator.value; //display value will be the operator value pressed
-                displayScreen.textContent += calculator.displayValue; //update display screen
-                calculator.chosenOperator = displayScreen.textContent; //save operator to chosenOperator
+            if(calculator.firstOperand != null && calculator.chosenOperator === null) { 
+                calculator.displayValue = operator.value; 
+                displayScreen.textContent += calculator.displayValue; 
+                calculator.chosenOperator = operator.value; //save operator to chosenOperator
                 console.log(calculator.chosenOperator);
+            } else if(calculator.chosenOperator != null) { 
+                alert("CANNOT SELECT MORE THAN ONE OPERATOR FOR NOW"); 
             } else {
-                alert("ERROR CANNOT HAVE MORE THAN TWO OPERANDS AND AN OPERATOR FOR NOW");
+                return null;
             }
         })
+    });
+    decimalButton.addEventListener('click', e => {
+        if(!calculator.displayValue.includes('.')) {
+            calculator.displayValue = decimalButton.value;
+            displayScreen.textContent += calculator.displayValue;
+        } else if(calculator.displayValue.includes('.')){
+            return alert("Cannot have multiple decimal points");
+        } else {
+            return null;
+        }
+    })
+    equalsButton.addEventListener('click', e => {
+        calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
+        displayScreen.textContent = calculator.displayValue;
     });
 }
 
 displayAll();
 
-//run the evaluate function when clicking on equal button
-/*equalsButton.addEventListener('click', function() {
-    evaluate();
-});*/
-
-//clear the display screen back to 0
-function clearDisplay() {
+function clearMemory() {
     clearButton.addEventListener('click', () => {
         if(displayScreen.textContent != "0") {
-            displayScreen.textContent = '0';
+            calculator.displayValue = 0;
+            calculator.firstOperand = null;
+            calculator.secondOperand = null;
+            calculator.chosenOperator = null;
+            displayScreen.textContent = calculator.displayValue;
         } else {
             return;
         }
     });
 };
-clearDisplay();
-
+clearMemory();
 
 function add(a, b) {
     return a + b;
@@ -94,15 +110,11 @@ function multiply(a, b) {
 };
 
 function divide(a, b) {
-    return a / b;
+    return (a / b).toFixed(2);
 };
 
 function percent(a) {
     return a / 100;
-};
-
-function squareRoot(a) {
-    return Math.sqrt(a);
 };
 
 //operator function
@@ -119,12 +131,10 @@ function operate(operator, a , b) {
         case 'x':
             return multiply(a, b);
         case '÷':
-            if(b === 0) return null
+            if(b === 0) return alert("HEY. That's against the laws.");
             else return divide(a, b);
         case '%':
             return percent(a);
-        case '√':
-            return squareRoot(a);
         default:
             return null;
     }
