@@ -5,8 +5,13 @@ const deleteButton = document.querySelector('#delete-button');
 const equalsButton = document.querySelector('#equals-button');
 const decimalButton = document.querySelector('#decimal-button');
 const negativeButton = document.querySelector('#negative-button');
-
 const displayScreen = document.querySelector('.display-screen');
+
+window.addEventListener('keypress', keyboardInput);
+decimalButton.addEventListener('click', decimal);
+negativeButton.addEventListener('click', negativeSign);
+clearButton.addEventListener('click', clearMemory);
+equalsButton.addEventListener('click', evaluate);
 
 const calculator = {
     displayValue: '0', 
@@ -52,29 +57,29 @@ function displayAll () {
                 displayScreen.textContent += calculator.displayValue; 
                 calculator.chosenOperator = operator.value; 
                 console.log(calculator.chosenOperator);
-            } else if(calculator.firstOperand != null && calculator.chosenOperator != null && calculator.secondOperand != null) { 
+            } else if(calculator.chosenOperator != null && calculator.secondOperand != null) {
                 calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
-                displayScreen.textContent = calculator.displayValue;
-                calculator.firstOperand = displayScreen.textContent;
-                calculator.chosenOperator = null;
+                calculator.chosenOperator = operator.value;
+                displayScreen.textContent = calculator.displayValue + calculator.chosenOperator;
+                calculator.firstOperand = calculator.displayValue;
                 calculator.secondOperand = null;
             } else {
                 return null;
             }
         })
     });
-    equalsButton.addEventListener('click', e => {
+}
+displayAll();
+
+function evaluate() {
         calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
         displayScreen.textContent = calculator.displayValue;
         calculator.firstOperand = displayScreen.textContent;
         calculator.chosenOperator = null;
         calculator.secondOperand = null;
-    });
 }
-displayAll();
 
 function decimal() {
-    decimalButton.addEventListener('click', e => {
         if(calculator.firstOperand === null) {
             return alert("Error");
         } else if(!calculator.firstOperand.includes('.') && calculator.chosenOperator === null) {
@@ -90,12 +95,9 @@ function decimal() {
         } else {
             return null;
         }
-    });
 }
-decimal();
 
 function negativeSign() {
-    negativeButton.addEventListener('click', e => {
         if(calculator.firstOperand === null) {
             calculator.displayValue = negativeButton.value;
             displayScreen.textContent = calculator.displayValue;
@@ -107,12 +109,9 @@ function negativeSign() {
         } else {
             return null;
         }
-    })
-}
-negativeSign();
+    }
 
 function clearMemory() {
-    clearButton.addEventListener('click', () => {
         if(displayScreen.textContent != "0") {
             calculator.displayValue = 0;
             calculator.firstOperand = null;
@@ -122,9 +121,39 @@ function clearMemory() {
         } else {
             return;
         }
-    });
 };
-clearMemory();
+
+function keyboardInput(e) {
+    if(displayScreen.textContent === '0') {
+            displayScreen.textContent = e.key; 
+            calculator.firstOperand = displayScreen.textContent; 
+            console.log(calculator.firstOperand);
+        } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
+            calculator.displayValue = e.key;
+            displayScreen.textContent += calculator.displayValue;
+            calculator.secondOperand = e.key; 
+            console.log(calculator.secondOperand);
+        } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) {
+            calculator.displayValue = e.key;
+            displayScreen.textContent += calculator.displayValue;
+            calculator.secondOperand += e.key;
+            console.log(calculator.secondOperand);
+        } else if(e.key === '.') {
+            return decimal();
+        } else if(e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+            calculator.displayValue = e.key; 
+            displayScreen.textContent += calculator.displayValue; 
+            calculator.chosenOperator = e.key; 
+            console.log(calculator.chosenOperator);
+        } else if(e.key === '=' || e.key === 'Enter') {
+            return evaluate();
+        } else {
+            calculator.displayValue = e.key;
+            displayScreen.textContent += calculator.displayValue;
+            calculator.firstOperand = displayScreen.textContent; 
+            console.log(calculator.firstOperand);
+        }
+    };
 
 
 function add(a, b) {
@@ -136,11 +165,11 @@ function subtract(a, b) {
 };
 
 function multiply(a, b) {
-    return (a * b).toFixed(2);
+    return (a * b).toFixed(1);
 };
 
 function divide(a, b) {
-    return (a / b).toFixed(2);
+    return (a / b).toFixed(7);
 };
 
 function percent(a) {
@@ -161,7 +190,7 @@ function operate(operator, a , b) {
         case 'x':
             return multiply(a, b);
         case '÷':
-            if(b === 0) return alert("HEY. That's against the laws.");
+            if(b === 0) return displayScreen.textContent = "That's illegal";
             else return divide(a, b);
         case '%':
             return percent(a);
