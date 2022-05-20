@@ -1,11 +1,85 @@
-#buttons-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&display=swap');
+
+* {
+    font-family: 'Quicksand', sans-serif;
+}
+
+main {
+    padding: 20px 30px;
+    border-radius: 5%;
+    /*margin: 30px 550px;*/
+    height: 550px;
+    position: fixed;
+    width: 300px;
+    background-color: #00afb9;
 }
 
 #display-container {
-    background-color: #fde7eb;
+    background-color: #fdfcdc;
+    border-radius: 5px;
     padding: 30px 30px 30px 30px;
     margin-bottom: 10px;
+    margin-top: 10px;
+    width: 240px;
+    height: 50px;
+    position: fixed;
+}
+
+.current-operand {
+    font-size: xx-large;
     text-align: right;
+    color: #0081a7;
+}
+
+.last-operand {
+    text-align: right;
+    color: #f07167;
+    font-size: large;
+    margin-bottom: 6px;
+}
+
+#buttons-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    height: 300px;
+    position: fixed;
+    margin-top: 160px;
+}
+
+button {
+    border-radius: 50%;
+    height: 70px;
+    border-style: none;
+    cursor: pointer;
+    width: 70px;
+    font-size: x-large;
+    font-weight: 400;
+    background-color: #fdfcdc;
+    color: #f07167;
+}
+
+.operator-btn {
+    background-color: #f07167;
+    color: #fdfcdc;
+}
+
+#negative-button {
+    background-color: #f07167;
+    color: #fdfcdc;
+}
+
+#equals-button {
+    background-color: #0081a7;
+    color: #fdfcdc;
+}
+
+#clear-button {
+    background-color: #0081a7;
+    color: #fdfcdc;
+}
+
+#delete-button {
+    background-color: #0081a7;
+    color: #fdfcdc;
 }

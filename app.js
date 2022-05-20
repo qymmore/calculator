@@ -7,7 +7,10 @@ const decimalButton = document.querySelector('#decimal-button');
 const negativeButton = document.querySelector('#negative-button');
 const displayScreen = document.querySelector('.display-screen');
 
-window.addEventListener('keypress', keyboardInput);
+let currentOperand = document.querySelector('.current-operand');
+let lastOperand = document.querySelector('.last-operand');
+
+
 decimalButton.addEventListener('click', decimal);
 negativeButton.addEventListener('click', negativeSign);
 clearButton.addEventListener('click', clearMemory);
@@ -21,90 +24,101 @@ const calculator = {
 }
 
 function defaultDisplay() {
-    displayScreen.textContent = calculator.displayValue;
+    currentOperand.textContent = calculator.displayValue;
+    lastOperand.textContent = '';
+    /*displayScreen.textContent = calculator.displayValue;*/
 }
 defaultDisplay();
 
-function displayAll () {
-    numberButtons.forEach((number) => {
-        number.addEventListener('click', function() {
-            if(displayScreen.textContent === '0') {
-                displayScreen.textContent = number.value; 
-                calculator.firstOperand = displayScreen.textContent; 
-                console.log(calculator.firstOperand);
-            } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
-                calculator.displayValue = number.value;
-                displayScreen.textContent += calculator.displayValue;
-                calculator.secondOperand = number.value; 
-                console.log(calculator.secondOperand);
-            } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) {
-                calculator.displayValue = number.value;
-                displayScreen.textContent += calculator.displayValue;
-                calculator.secondOperand += number.value ;
-                console.log(calculator.secondOperand);
-            } else {
-                calculator.displayValue = number.value;
-                displayScreen.textContent += calculator.displayValue;
-                calculator.firstOperand = displayScreen.textContent; 
-                console.log(calculator.firstOperand);
-            }
-        })
-    });
-    operatorButtons.forEach((operator) => {
-        operator.addEventListener('click', function() {
-            if(calculator.firstOperand != null && calculator.chosenOperator === null && calculator.secondOperand === null) { 
-                calculator.displayValue = operator.value; 
-                displayScreen.textContent += calculator.displayValue; 
-                calculator.chosenOperator = operator.value; 
-                console.log(calculator.chosenOperator);
-            } else if(calculator.chosenOperator != null && calculator.secondOperand != null) {
-                calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
-                calculator.chosenOperator = operator.value;
-                displayScreen.textContent = calculator.displayValue + calculator.chosenOperator;
-                calculator.firstOperand = calculator.displayValue;
-                calculator.secondOperand = null;
-            } else {
-                return null;
-            }
-        })
-    });
-}
-displayAll();
+numberButtons.forEach((number) => {
+    number.addEventListener('click', function() {
+        if(currentOperand.textContent === '0') {
+            currentOperand.textContent = number.value; 
+            calculator.firstOperand =  currentOperand.textContent; //store first number in firstOperand 
+            console.log(calculator.firstOperand);
+        } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
+            calculator.displayValue = number.value;
+            currentOperand.textContent = calculator.displayValue;
+            calculator.secondOperand = number.value; //if secondOperand is empty store the numbers in secondOperand
+            lastOperand.textContent += calculator.chosenOperator;
+            console.log(calculator.secondOperand);
+        } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) {
+            calculator.displayValue = number.value;
+            currentOperand.textContent += calculator.displayValue;
+            calculator.secondOperand += number.value ; //store all consecutive numbers in secondOperand
+            console.log(calculator.secondOperand);
+        } else {
+            calculator.displayValue = number.value;
+            currentOperand.textContent += calculator.displayValue;
+            calculator.firstOperand = currentOperand.textContent; //store all consecutive digits in firstOperand
+            console.log(calculator.firstOperand);
+        }
+    })
+});
+
+operatorButtons.forEach((operator) => {
+operator.addEventListener('click', function() {
+    if(calculator.firstOperand != null && calculator.chosenOperator === null && calculator.secondOperand === null) { 
+        calculator.displayValue = operator.value; 
+        currentOperand.textContent = calculator.displayValue;
+        calculator.chosenOperator = operator.value; 
+        lastOperand.textContent += calculator.firstOperand;
+        console.log(calculator.chosenOperator);
+    } else if(calculator.firstOperand != null && calculator.chosenOperator != null && calculator.secondOperand != null) {
+        calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
+        calculator.chosenOperator = operator.value;
+        lastOperand.textContent = calculator.displayValue;
+        currentOperand.textContent = calculator.chosenOperator;
+        calculator.firstOperand = calculator.displayValue;
+        calculator.secondOperand = null;
+    } else {
+        return null;
+    }
+})
+});
 
 function evaluate() {
-        calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
-        displayScreen.textContent = calculator.displayValue;
-        calculator.firstOperand = displayScreen.textContent;
-        calculator.chosenOperator = null;
-        calculator.secondOperand = null;
+    calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
+    lastOperand.textContent += calculator.secondOperand;
+    currentOperand.textContent = calculator.displayValue;
+    calculator.firstOperand = currentOperand.textContent;
+    calculator.chosenOperator = null;
+    calculator.secondOperand = null;
+    if(calculator.firstOperand != null && calculator.chosenOperator === null) {
+        currentOperand.textContent = calculator.displayValue
+        lastOperand.textContent = calculator.chosenOperator;
+    } else {
+        return null;
+    }
 }
+
 
 function decimal() {
         if(calculator.firstOperand === null) {
             return alert("Error");
         } else if(!calculator.firstOperand.includes('.') && calculator.chosenOperator === null) {
             calculator.displayValue = decimalButton.value;
-            displayScreen.textContent += calculator.displayValue;
+            currentOperand.textContent += calculator.displayValue;
             calculator.firstOperand = calculator.displayValue;
-        } else if(!calculator.secondOperand.includes('.')) {
+        } else if(!calculator.secondOperand.includes('.') && calculator.chosenOperator != null && calculator.firstOperand != null) {
             calculator.displayValue = decimalButton.value;
-            displayScreen.textContent += calculator.displayValue;
+            currentOperand.textContent += calculator.displayValue;
             calculator.secondOperand += calculator.displayValue;
-        } else if(calculator.firstOperand.includes('.') || calculator.secondOperand.includes('.')) {
-            return alert("Cannot have more than one decimal point per operand.");
+        } else if(calculator.firstOperand.includes('.') && calculator.secondOperand.includes('.')) {
+            return alert("Error");
         } else {
-            return null;
+            return;
         }
 }
 
 function negativeSign() {
         if(calculator.firstOperand === null) {
             calculator.displayValue = negativeButton.value;
-            displayScreen.textContent = calculator.displayValue;
+            currentOperand.textContent = calculator.displayValue;
             calculator.firstOperand = calculator.displayValue;
         } else if(calculator.secondOperand === null) {
             calculator.displayValue = negativeButton.value;
-            displayScreen.textContent += calculator.displayValue;
+            currentOperand.textContent += calculator.displayValue;
             calculator.secondOperand = calculator.displayValue;
         } else {
             return null;
@@ -112,49 +126,17 @@ function negativeSign() {
     }
 
 function clearMemory() {
-        if(displayScreen.textContent != "0") {
+        if(currentOperand.textContent != "0") {
             calculator.displayValue = 0;
             calculator.firstOperand = null;
             calculator.secondOperand = null;
             calculator.chosenOperator = null;
-            displayScreen.textContent = calculator.displayValue;
+            currentOperand.textContent = calculator.displayValue;
+            lastOperand.textContent = '';
         } else {
             return;
         }
 };
-
-function keyboardInput(e) {
-    if(displayScreen.textContent === '0') {
-            displayScreen.textContent = e.key; 
-            calculator.firstOperand = displayScreen.textContent; 
-            console.log(calculator.firstOperand);
-        } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
-            calculator.displayValue = e.key;
-            displayScreen.textContent += calculator.displayValue;
-            calculator.secondOperand = e.key; 
-            console.log(calculator.secondOperand);
-        } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) {
-            calculator.displayValue = e.key;
-            displayScreen.textContent += calculator.displayValue;
-            calculator.secondOperand += e.key;
-            console.log(calculator.secondOperand);
-        } else if(e.key === '.') {
-            return decimal();
-        } else if(e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
-            calculator.displayValue = e.key; 
-            displayScreen.textContent += calculator.displayValue; 
-            calculator.chosenOperator = e.key; 
-            console.log(calculator.chosenOperator);
-        } else if(e.key === '=' || e.key === 'Enter') {
-            return evaluate();
-        } else {
-            calculator.displayValue = e.key;
-            displayScreen.textContent += calculator.displayValue;
-            calculator.firstOperand = displayScreen.textContent; 
-            console.log(calculator.firstOperand);
-        }
-    };
-
 
 function add(a, b) {
     return (a + b).toFixed(1);
@@ -198,4 +180,6 @@ function operate(operator, a , b) {
             return null;
     }
 };
+
+
 
