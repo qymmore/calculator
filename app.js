@@ -15,6 +15,7 @@ decimalButton.addEventListener('click', decimal);
 negativeButton.addEventListener('click', negativeSign);
 clearButton.addEventListener('click', clearMemory);
 equalsButton.addEventListener('click', evaluate);
+deleteButton.addEventListener('click', remove);
 
 const calculator = {
     displayValue: '0', 
@@ -26,7 +27,6 @@ const calculator = {
 function defaultDisplay() {
     currentOperand.textContent = calculator.displayValue;
     lastOperand.textContent = '';
-    /*displayScreen.textContent = calculator.displayValue;*/
 }
 defaultDisplay();
 
@@ -37,19 +37,16 @@ numberButtons.forEach((number) => {
             calculator.firstOperand =  currentOperand.textContent; //store first number in firstOperand 
             console.log(calculator.firstOperand);
         } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
-            calculator.displayValue = number.value;
-            currentOperand.textContent = calculator.displayValue;
-            calculator.secondOperand = number.value; //if secondOperand is empty store the numbers in secondOperand
+            currentOperand.textContent = number.value;
+            calculator.secondOperand = currentOperand.textContent; //if secondOperand is empty store the numbers in secondOperand
             lastOperand.textContent += calculator.chosenOperator;
             console.log(calculator.secondOperand);
         } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) {
-            calculator.displayValue = number.value;
-            currentOperand.textContent += calculator.displayValue;
-            calculator.secondOperand += number.value ; //store all consecutive numbers in secondOperand
+            currentOperand.textContent += number.value;
+            calculator.secondOperand = currentOperand.textContent; //store all consecutive numbers in secondOperand
             console.log(calculator.secondOperand);
         } else {
-            calculator.displayValue = number.value;
-            currentOperand.textContent += calculator.displayValue;
+            currentOperand.textContent += number.value;
             calculator.firstOperand = currentOperand.textContent; //store all consecutive digits in firstOperand
             console.log(calculator.firstOperand);
         }
@@ -58,40 +55,63 @@ numberButtons.forEach((number) => {
 
 operatorButtons.forEach((operator) => {
 operator.addEventListener('click', function() {
-    if(calculator.firstOperand != null && calculator.chosenOperator === null && calculator.secondOperand === null) { 
-        calculator.displayValue = operator.value; 
-        currentOperand.textContent = calculator.displayValue;
-        calculator.chosenOperator = operator.value; 
+    if(calculator.firstOperand != null && calculator.chosenOperator == null && calculator.secondOperand === null) { 
+        currentOperand.textContent = operator.value;
+        calculator.chosenOperator = currentOperand.textContent;
         lastOperand.textContent += calculator.firstOperand;
         console.log(calculator.chosenOperator);
     } else if(calculator.firstOperand != null && calculator.chosenOperator != null && calculator.secondOperand != null) {
-        calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
+        currentOperand.textContent = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
         calculator.chosenOperator = operator.value;
-        lastOperand.textContent = calculator.displayValue;
+        lastOperand.textContent = currentOperand.textContent;
         currentOperand.textContent = calculator.chosenOperator;
-        calculator.firstOperand = calculator.displayValue;
+        calculator.firstOperand = lastOperand.textContent;
         calculator.secondOperand = null;
+    } else if(currentOperand.textContent == '') {
+        currentOperand.textContent = operator.value;
+        calculator.chosenOperator = currentOperand.textContent;
+        lastOperand.textContent = calculator.firstOperand;
+        console.log(calculator.chosenOperator);
     } else {
         return null;
     }
 })
 });
 
+function remove() {
+    if((calculator.firstOperand !== null || calculator.firstOperand !== '') && (calculator.chosenOperator == null || calculator.chosenOperator == '') && (calculator.secondOperand == null || calculator.secondOperand == '')) {
+        currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
+        calculator.firstOperand = currentOperand.textContent;
+        console.log(calculator.firstOperand);
+    } else if((calculator.firstOperand !== null || calculator.firstOperand !== '') && (calculator.chosenOperator !== null || calculator.chosenOperator !== '') && (calculator.secondOperand == null || calculator.secondOperand == '')) {
+        currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
+        calculator.chosenOperator = currentOperand.textContent;
+        console.log(calculator.chosenOperator);
+    } else if((calculator.firstOperand !== null || calculator.firstOperand !== '') && (calculator.chosenOperator !== null || calculator.chosenOperator !== '') && (calculator.secondOperand !== null || calculator.secondOperand !== '')) {
+        currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
+        calculator.secondOperand = currentOperand.textContent;
+        console.log(calculator.secondOperand);
+    } else return null;
+};
+
 function evaluate() {
-    calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
-    lastOperand.textContent += calculator.secondOperand;
-    currentOperand.textContent = calculator.displayValue;
-    calculator.firstOperand = currentOperand.textContent;
-    calculator.chosenOperator = null;
-    calculator.secondOperand = null;
+    if(calculator.firstOperand !== null && calculator.chosenOperator !== null && calculator.secondOperand !== null) {
+        calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand);
+        lastOperand.textContent += calculator.secondOperand;
+        currentOperand.textContent = calculator.displayValue;
+        calculator.firstOperand = currentOperand.textContent;
+        calculator.chosenOperator = null;
+        calculator.secondOperand = null;
     if(calculator.firstOperand != null && calculator.chosenOperator === null) {
         currentOperand.textContent = calculator.displayValue
         lastOperand.textContent = calculator.chosenOperator;
     } else {
         return null;
     }
+} else {
+    currentOperand.textContent = calculator.displayValue;
 }
-
+};
 
 function decimal() {
         if(calculator.firstOperand === null) {
@@ -151,14 +171,12 @@ function multiply(a, b) {
 };
 
 function divide(a, b) {
-    return (a / b).toFixed(7);
+    return (a / b).toFixed(2);
 };
 
 function percent(a) {
     return (a / 100).toFixed(2);
 };
-
-//operator function
 
 function operate(operator, a , b) {
     a = Number(a);
@@ -172,7 +190,7 @@ function operate(operator, a , b) {
         case 'x':
             return multiply(a, b);
         case '÷':
-            if(b === 0) return displayScreen.textContent = "That's illegal";
+            if(b === 0) return currentOperand.textContent = "That's illegal";
             else return divide(a, b);
         case '%':
             return percent(a);
