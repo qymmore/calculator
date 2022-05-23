@@ -16,6 +16,7 @@ negativeButton.addEventListener('click', negativeSign);
 clearButton.addEventListener('click', clearMemory);
 equalsButton.addEventListener('click', evaluate);
 deleteButton.addEventListener('click', remove);
+window.addEventListener('keypress', keyboardInput);
 
 const calculator = {
     displayValue: '0', 
@@ -45,7 +46,8 @@ numberButtons.forEach((number) => {
             currentOperand.textContent += number.value;
             calculator.secondOperand = currentOperand.textContent; //store all consecutive numbers in secondOperand
             console.log(calculator.secondOperand);
-        } else {
+        }
+        else {
             currentOperand.textContent += number.value;
             calculator.firstOperand = currentOperand.textContent; //store all consecutive digits in firstOperand
             console.log(calculator.firstOperand);
@@ -79,7 +81,7 @@ operator.addEventListener('click', function() {
 });
 
 function remove() {
-    if((calculator.firstOperand !== null || calculator.firstOperand !== '') && (calculator.chosenOperator == null || calculator.chosenOperator == '') && (calculator.secondOperand == null || calculator.secondOperand == '')) {
+    if(calculator.firstOperand !== '' && (calculator.chosenOperator == null || calculator.chosenOperator == '') && (calculator.secondOperand == null || calculator.secondOperand == '')) {
         currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
         calculator.firstOperand = currentOperand.textContent;
         console.log(calculator.firstOperand);
@@ -91,7 +93,8 @@ function remove() {
         currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
         calculator.secondOperand = currentOperand.textContent;
         console.log(calculator.secondOperand);
-    } else return null;
+    }
+    else return null;
 };
 
 function evaluate() {
@@ -103,13 +106,13 @@ function evaluate() {
         calculator.chosenOperator = null;
         calculator.secondOperand = null;
     if(calculator.firstOperand != null && calculator.chosenOperator === null) {
-        currentOperand.textContent = calculator.displayValue
+        currentOperand.textContent = calculator.firstOperand;
         lastOperand.textContent = calculator.chosenOperator;
     } else {
         return null;
     }
 } else {
-    currentOperand.textContent = calculator.displayValue;
+        currentOperand.textContent = calculator.displayValue;
 }
 };
 
@@ -146,16 +149,91 @@ function negativeSign() {
     }
 
 function clearMemory() {
-        if(currentOperand.textContent != "0") {
-            calculator.displayValue = 0;
+        if(currentOperand.textContent != "0" || currentOperand.textContent != null) {
             calculator.firstOperand = null;
             calculator.secondOperand = null;
             calculator.chosenOperator = null;
-            currentOperand.textContent = calculator.displayValue;
+            currentOperand.textContent = '0';
             lastOperand.textContent = '';
         } else {
             return;
         }
+};
+
+function keyboardInput(e) {
+    if(currentOperand.textContent === '0') {
+        if(e.key == '.') {
+            return alert('Error');
+        } else {
+                    currentOperand.textContent = e.key; 
+                    calculator.firstOperand = currentOperand.textContent; 
+                    console.log(calculator.firstOperand);
+                }
+            }
+    else if(e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') { 
+        currentOperand.textContent = e.key; 
+        calculator.chosenOperator = currentOperand.textContent; 
+        lastOperand.textContent = calculator.firstOperand; 
+        console.log(calculator.chosenOperator);
+    } else if(calculator.firstOperand != null && calculator.secondOperand === null && calculator.chosenOperator != null) {
+            currentOperand.textContent = e.key;
+            calculator.secondOperand = currentOperand.textContent; 
+            lastOperand.textContent += calculator.chosenOperator; 
+            console.log(calculator.secondOperand);
+    } else if(calculator.secondOperand != null && calculator.firstOperand != null && calculator.chosenOperator != null) { 
+            if(e.key == '=' || e.key == 'Enter') { 
+            calculator.displayValue = operate(calculator.chosenOperator, calculator.firstOperand, calculator.secondOperand); 
+            lastOperand.textContent += calculator.secondOperand; 
+            currentOperand.textContent = calculator.displayValue; 
+            calculator.firstOperand = currentOperand.textContent; 
+            calculator.chosenOperator = null;
+            calculator.secondOperand = null;
+            } else if(!calculator.secondOperand.includes('.')) { 
+                    currentOperand.textContent += e.key;
+                    calculator.secondOperand = currentOperand.textContent;
+                    lastOperand.textContent = calculator.firstOperand + calculator.chosenOperator;
+                    console.log(calculator.secondOperand);
+                } else if(calculator.secondOperand.includes('.') && e.key == '.') {
+                    return alert('Error');
+                } else if(calculator.secondOperand.includes('.')) {
+                    currentOperand.textContent += e.key;
+                    calculator.secondOperand = currentOperand.textContent; 
+                    lastOperand.textContent = calculator.firstOperand + calculator.chosenOperator;
+                    console.log(calculator.secondOperand);
+                }
+            }
+    else if(e.key == 'Delete' || e.key == 'Backspace') {
+        if(calculator.firstOperand !== '' && (calculator.chosenOperator == null || calculator.chosenOperator == '') && (calculator.secondOperand == null || calculator.secondOperand == '')) {
+            currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
+            calculator.firstOperand = currentOperand.textContent;
+            console.log(calculator.firstOperand);
+        } else if((calculator.firstOperand !== null || calculator.firstOperand !== '') && (calculator.chosenOperator !== null || calculator.chosenOperator !== '') && (calculator.secondOperand == null || calculator.secondOperand == '')) {
+            currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
+            calculator.chosenOperator = currentOperand.textContent;
+            console.log(calculator.chosenOperator);
+        } else if((calculator.firstOperand !== null || calculator.firstOperand !== '') && (calculator.chosenOperator !== null || calculator.chosenOperator !== '') && (calculator.secondOperand !== null || calculator.secondOperand !== '')) {
+            currentOperand.textContent = currentOperand.textContent.substring(0, currentOperand.textContent.length - 1);
+            calculator.secondOperand = currentOperand.textContent;
+            console.log(calculator.secondOperand);
+        }
+        else return null;
+    }
+    else {
+        if(!calculator.firstOperand.includes('.')) { 
+            currentOperand.textContent += e.key;
+            calculator.firstOperand = currentOperand.textContent; 
+            console.log(calculator.firstOperand); 
+        } else if(calculator.firstOperand.includes('.') && e.key == '.') { 
+            return alert('Error');
+        } else if(calculator.firstOperand.includes('.')) { 
+            currentOperand.textContent += e.key;
+            calculator.firstOperand = currentOperand.textContent; 
+            console.log(calculator.firstOperand); 
+        }
+        else {
+            return null;
+        }
+    }
 };
 
 function add(a, b) {
@@ -189,7 +267,12 @@ function operate(operator, a , b) {
             return subtract(a, b);
         case 'x':
             return multiply(a, b);
+        case '*':
+            return multiply(a, b);
         case '÷':
+            if(b === 0) return currentOperand.textContent = "That's illegal";
+            else return divide(a, b);
+        case '/':
             if(b === 0) return currentOperand.textContent = "That's illegal";
             else return divide(a, b);
         case '%':
@@ -198,6 +281,3 @@ function operate(operator, a , b) {
             return null;
     }
 };
-
-
-
