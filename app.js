@@ -111,6 +111,9 @@ function evaluate() {
     } else {
         return null;
     }
+} else if(calculator.firstOperand !== null && currentOperand.textContent == '%') {
+    currentOperand.textContent = operate(currentOperand.textContent, calculator.firstOperand);
+    lastOperand.textContent += calculator.chosenOperator;
 } else {
         currentOperand.textContent = calculator.displayValue;
 }
